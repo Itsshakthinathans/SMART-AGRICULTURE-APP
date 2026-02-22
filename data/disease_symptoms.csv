@@ -1,0 +1,21 @@
+temp,humidity,leaf_spots,leaf_yellowing,wilting,powdery_growth,stem_rot,disease
+25,60,0,0,0,0,0,Healthy
+27,65,1,0,0,0,0,Bacterial Spot
+30,72,1,1,0,0,0,Bacterial Spot
+31,78,1,1,1,0,0,Leaf Blight
+29,75,0,1,0,1,0,Powdery Mildew
+26,82,0,1,1,1,0,Powdery Mildew
+24,88,0,1,1,0,1,Root Rot
+22,90,0,1,1,0,1,Root Rot
+28,70,1,1,0,0,0,Bacterial Spot
+30,80,1,1,1,0,0,Leaf Blight
+21,55,0,0,0,0,0,Healthy
+23,58,0,0,0,0,0,Healthy
+32,76,1,1,1,0,0,Leaf Blight
+27,73,0,1,0,1,0,Powdery Mildew
+24,86,0,1,1,0,1,Root Rot
+29,62,1,0,0,0,0,Bacterial Spot
+26,67,0,1,0,1,0,Powdery Mildew
+31,81,1,1,1,0,0,Leaf Blight
+20,52,0,0,0,0,0,Healthy
+25,89,0,1,1,0,1,Root Rot

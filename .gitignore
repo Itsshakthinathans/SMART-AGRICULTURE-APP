@@ -1,0 +1,14 @@
+# Python cache/artifacts
+__pycache__/
+*.py[cod]
+
+# Virtual envs
+.venv/
+venv/
+
+# Node modules
+node_modules/
+
+# Trained model artifacts
+models/*.joblib
+models/*.json

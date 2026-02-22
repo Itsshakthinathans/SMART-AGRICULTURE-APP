@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FarmIntel Pro | Crop Recommendation & Disease Detection</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="kicker">AI-Powered Smart Agriculture</p>
+      <h1>FarmIntel Pro Dashboard</h1>
+      <p class="subtitle">Full-stack platform for crop recommendation and plant disease detection with actionable solutions.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h2>Crop Recommendation</h2>
+      <form id="cropForm" class="grid-form">
+        <label>Nitrogen (N)<input name="N" type="number" required step="any"></label>
+        <label>Phosphorus (P)<input name="P" type="number" required step="any"></label>
+        <label>Potassium (K)<input name="K" type="number" required step="any"></label>
+        <label>Temperature (°C)<input name="temperature" type="number" required step="any"></label>
+        <label>Humidity (%)<input name="humidity" type="number" required step="any"></label>
+        <label>pH<input name="ph" type="number" required step="any"></label>
+        <label>Rainfall (mm)<input name="rainfall" type="number" required step="any"></label>
+        <button type="submit">Recommend Crop</button>
+      </form>
+      <div id="cropResult" class="result"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Plant Disease Detection</h2>
+      <form id="diseaseForm" class="grid-form">
+        <label>Temperature (°C)<input name="temp" type="number" required step="any"></label>
+        <label>Humidity (%)<input name="humidity" type="number" required step="any"></label>
+        <label>Leaf Spots<select name="leaf_spots"><option value="0">No</option><option value="1">Yes</option></select></label>
+        <label>Leaf Yellowing<select name="leaf_yellowing"><option value="0">No</option><option value="1">Yes</option></select></label>
+        <label>Wilting<select name="wilting"><option value="0">No</option><option value="1">Yes</option></select></label>
+        <label>Powdery Growth<select name="powdery_growth"><option value="0">No</option><option value="1">Yes</option></select></label>
+        <label>Stem Rot<select name="stem_rot"><option value="0">No</option><option value="1">Yes</option></select></label>
+        <button type="submit">Detect Disease</button>
+      </form>
+      <div id="diseaseResult" class="result"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Recent Predictions</h2>
+      <div class="history-wrap">
+        <div>
+          <h3>Crop History</h3>
+          <ul id="cropHistory"></ul>
+        </div>
+        <div>
+          <h3>Disease History</h3>
+          <ul id="diseaseHistory"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
