@@ -1,15 +1,33 @@
-# Smart Agriculture App (Full Stack)
+# AgriTech Pro - Full Stack Smart Agriculture Platform
 
-This project provides:
-- **Crop Recommendation** using an ML classifier (Python + scikit-learn).
-- **Plant Disease Detection + Solution** using an image-analysis ML heuristic (Python + Flask).
-- **Modern Web UI** with HTML/CSS/JavaScript.
-- **Node.js API Gateway** that serves frontend and proxies requests to Flask ML backend.
+A complete full-stack project for:
+1. **Crop recommendation** using ML trained from a Kaggle crop dataset.
+2. **Plant disease detection** from leaf images using ML trained from Kaggle PlantVillage-style data.
+3. **Actionable advisory** with fertilizer hints and disease treatment guidance.
 
-## Tech Stack
-- Frontend: HTML, CSS, JavaScript
-- Gateway/API + static hosting: Node.js, Express, Multer
-- ML backend: Python, Flask, scikit-learn, NumPy, Pillow
+Built with **Flask (Python ML API)** + **Node.js (gateway)** + **HTML/CSS/JS frontend**.
+
+## Key Functionalities
+- Kaggle-dataset-based model training (not just synthetic demo data).
+- Model health + status API.
+- Manual model retraining endpoint.
+- Crop recommendation with top-5 confidence predictions.
+- NPK-based fertilizer hint generation.
+- Leaf-image disease classification with top matches.
+- Clean modern UI with model status panel.
+- Optional weather auto-fill by geolocation (Open-Meteo API in browser).
+
+## Architecture
+
+```
+Browser (public/) -> Node.js Express (server.js) -> Flask ML API (backend/app.py)
+```
+
+## Kaggle Datasets Used
+- Crop recommendation: `atharvaingle/crop-recommendation-dataset`
+- Plant disease: `emmarex/plantdisease`
+
+See setup instructions in `backend/data/README.md`.
 
 ## Project Structure
 
@@ -18,9 +36,14 @@ This project provides:
 ├── backend
 │   ├── app.py
 │   ├── requirements.txt
+│   ├── data
+│   │   └── README.md
+│   ├── scripts
+│   │   └── fetch_kaggle_data.py
 │   └── ml
 │       ├── crop_recommendation.py
-│       └── disease_detector.py
+│       ├── disease_detector.py
+│       └── models/
 ├── public
 │   ├── index.html
 │   ├── script.js
@@ -29,49 +52,40 @@ This project provides:
 └── server.js
 ```
 
-## Run Locally
+## Setup
 
-### 1) Start Flask backend
+### 1) Python backend
 ```bash
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```
+
+### 2) Put Kaggle datasets in place
+Follow `backend/data/README.md`.
+
+### 3) Run Flask
+```bash
 python app.py
 ```
-Flask runs on `http://localhost:5000`.
 
-### 2) Start Node frontend + proxy server
-Open another terminal:
+### 4) Run Node server (new terminal)
 ```bash
 npm install
 npm start
 ```
-Node runs on `http://localhost:3000`.
+
+Open: `http://localhost:3000`
 
 ## API Endpoints
 
-### Crop recommendation
-`POST /api/recommend-crop`
-
-Body:
-```json
-{
-  "nitrogen": 90,
-  "phosphorus": 42,
-  "potassium": 43,
-  "temperature": 20,
-  "humidity": 82,
-  "ph": 6.5,
-  "rainfall": 220
-}
-```
-
-### Disease detection
-`POST /api/disease-detect` with `multipart/form-data`
-- key: `leafImage`
-- value: image file
+- `GET /health`
+- `GET /api/model-info`
+- `POST /api/train-models`
+- `POST /api/recommend-crop`
+- `POST /api/disease-detect` (`multipart/form-data`, key `leafImage`)
 
 ## Notes
-- Crop model is trained on compact agronomy-oriented sample data for demonstration.
-- Disease detection uses color-pattern ML-style heuristics and returns treatment + prevention guidance.
+- If datasets are missing, `/health` and `/api/model-info` show boot errors with exact paths.
+- Retraining can be triggered after placing new data.

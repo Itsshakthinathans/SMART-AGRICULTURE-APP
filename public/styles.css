@@ -1,11 +1,74 @@
-* { box-sizing: border-box; font-family: Arial, sans-serif; }
-body { margin: 0; background: #f4fff4; color: #193b19; }
-.hero { text-align: center; padding: 2rem 1rem; background: linear-gradient(135deg, #2f8f2f, #69b769); color: #fff; }
-.container { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); padding: 1rem; max-width: 1100px; margin: auto; }
-.card { background: #fff; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); padding: 1rem; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-input, button { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #cfd8cf; }
-button { background: #2f8f2f; color: white; border: none; cursor: pointer; font-weight: bold; }
-button:hover { opacity: 0.92; }
-.result { margin-top: 0.75rem; padding: 0.75rem; background: #f2f9f2; border-radius: 8px; min-height: 52px; }
-@media (max-width: 700px){ .grid { grid-template-columns: 1fr; } }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+  background: #f4fbf4;
+  color: #0f2b0f;
+}
+.hero {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: white;
+  background: radial-gradient(circle at 20% 20%, #4da84d, #1e6f1e);
+}
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+.container {
+  max-width: 1150px;
+  margin: 1rem auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
+.card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 5px 20px rgba(15, 70, 15, 0.12);
+  padding: 1rem;
+}
+.card.full { grid-column: 1 / -1; }
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+}
+.stack { display: grid; gap: 0.7rem; }
+input, button {
+  width: 100%;
+  border-radius: 10px;
+  padding: 0.75rem;
+  border: 1px solid #ccddcc;
+}
+button {
+  border: none;
+  background: #1f7a1f;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+button:hover { opacity: 0.93; }
+.result, pre {
+  margin-top: 0.8rem;
+  background: #f3faf3;
+  border-radius: 10px;
+  padding: 0.8rem;
+  white-space: pre-wrap;
+  overflow: auto;
+}
+.badge {
+  display: inline-block;
+  background: #dff4df;
+  color: #145214;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  margin-right: 0.3rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+}
+@media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }

@@ -1,60 +1,89 @@
+import os
+from dataclasses import dataclass
+from typing import Dict, List
+
 import numpy as np
+import pandas as pd
+from joblib import dump, load
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+
+
+FEATURES = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]
+
+
+@dataclass
+class CropTrainingResult:
+    accuracy: float
+    samples: int
+    classes: List[str]
 
 
 class CropRecommendationModel:
-    def __init__(self):
-        self.model = RandomForestClassifier(n_estimators=200, random_state=42)
-        self.labels = np.array([
-            "rice",
-            "maize",
-            "cotton",
-            "wheat",
-            "jute",
-            "chickpea",
-            "mango",
-            "apple",
-            "banana",
-        ])
-        self._train()
+    """
+    Trains on Kaggle Crop Recommendation dataset:
+    https://www.kaggle.com/datasets/atharvaingle/crop-recommendation-dataset
+    Expected CSV columns: N, P, K, temperature, humidity, ph, rainfall, label
+    """
 
-    def _train(self):
-        # Synthetic-but-realistic agronomy ranges: N, P, K, temperature, humidity, pH, rainfall
-        X = np.array([
-            [90, 42, 43, 20, 82, 6.5, 220],
-            [85, 58, 41, 23, 80, 6.2, 200],
-            [60, 55, 45, 27, 62, 6.8, 120],
-            [62, 50, 44, 26, 60, 6.7, 115],
-            [120, 40, 20, 30, 55, 6.4, 95],
-            [118, 38, 22, 31, 52, 6.6, 90],
-            [80, 40, 40, 18, 65, 6.1, 80],
-            [75, 45, 35, 17, 68, 6.3, 75],
-            [70, 38, 42, 26, 88, 6.9, 180],
-            [72, 35, 40, 28, 85, 6.8, 170],
-            [35, 60, 80, 22, 45, 7.1, 60],
-            [38, 65, 75, 21, 48, 7.0, 55],
-            [20, 30, 30, 27, 70, 5.8, 130],
-            [25, 35, 28, 28, 68, 5.9, 140],
-            [22, 28, 32, 16, 72, 6.0, 150],
-            [24, 26, 35, 15, 74, 5.7, 145],
-            [100, 35, 80, 29, 75, 6.0, 160],
-            [95, 32, 78, 30, 78, 6.1, 165],
-        ])
-        y = np.array([
-            "rice", "rice",
-            "maize", "maize",
-            "cotton", "cotton",
-            "wheat", "wheat",
-            "jute", "jute",
-            "chickpea", "chickpea",
-            "mango", "mango",
-            "apple", "apple",
-            "banana", "banana",
-        ])
-        self.model.fit(X, y)
+    def __init__(self, dataset_path: str, model_path: str):
+        self.dataset_path = dataset_path
+        self.model_path = model_path
+        self.model = None
+        self.classes_ = []
 
-    def predict(self, input_features):
-        features = np.array([
+        if os.path.exists(self.model_path):
+            self._load()
+        else:
+            self.train_and_save()
+
+    def _load_dataset(self):
+        if not os.path.exists(self.dataset_path):
+            raise FileNotFoundError(
+                f"Crop dataset not found at {self.dataset_path}. "
+                "Download from Kaggle and place CSV at this location."
+            )
+
+        df = pd.read_csv(self.dataset_path)
+        required = set(FEATURES + ["label"])
+        missing = required - set(df.columns)
+        if missing:
+            raise ValueError(f"Dataset missing required columns: {sorted(missing)}")
+        return df
+
+    def train_and_save(self) -> CropTrainingResult:
+        df = self._load_dataset()
+        X = df[FEATURES].astype(float)
+        y = df["label"].astype(str)
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=y
+        )
+
+        self.model = RandomForestClassifier(
+            n_estimators=400,
+            random_state=42,
+            n_jobs=-1,
+            class_weight="balanced_subsample",
+        )
+        self.model.fit(X_train, y_train)
+        accuracy = float(self.model.score(X_test, y_test))
+        self.classes_ = list(self.model.classes_)
+
+        os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
+        dump({"model": self.model, "classes": self.classes_}, self.model_path)
+
+        _ = classification_report(y_test, self.model.predict(X_test), output_dict=True)
+        return CropTrainingResult(accuracy=accuracy, samples=len(df), classes=self.classes_)
+
+    def _load(self):
+        payload = load(self.model_path)
+        self.model = payload["model"]
+        self.classes_ = payload["classes"]
+
+    def predict(self, input_features: Dict[str, float]):
+        values = [
             input_features["nitrogen"],
             input_features["phosphorus"],
             input_features["potassium"],
@@ -62,14 +91,34 @@ class CropRecommendationModel:
             input_features["humidity"],
             input_features["ph"],
             input_features["rainfall"],
-        ]).reshape(1, -1)
+        ]
+        X = np.array(values, dtype=float).reshape(1, -1)
 
-        prediction = self.model.predict(features)[0]
-        probabilities = self.model.predict_proba(features)[0]
-        class_scores = dict(zip(self.model.classes_, probabilities))
-        sorted_scores = sorted(class_scores.items(), key=lambda x: x[1], reverse=True)
+        pred = self.model.predict(X)[0]
+        proba = self.model.predict_proba(X)[0]
+        ranked = sorted(zip(self.model.classes_, proba), key=lambda t: t[1], reverse=True)
 
         return {
-            "recommended_crop": prediction,
-            "top_choices": [{"crop": c, "confidence": round(s * 100, 2)} for c, s in sorted_scores[:3]],
+            "recommended_crop": pred,
+            "top_choices": [
+                {"crop": crop, "confidence": round(float(score) * 100, 2)}
+                for crop, score in ranked[:5]
+            ],
         }
+
+    def fertilizer_hint(self, input_features: Dict[str, float]):
+        n, p, k = (
+            float(input_features["nitrogen"]),
+            float(input_features["phosphorus"]),
+            float(input_features["potassium"]),
+        )
+        hints = []
+        if n < 40:
+            hints.append("Low Nitrogen: add urea/compost in split doses.")
+        if p < 30:
+            hints.append("Low Phosphorus: apply single super phosphate near root zone.")
+        if k < 30:
+            hints.append("Low Potassium: apply muriate of potash for stress tolerance.")
+        if not hints:
+            hints.append("NPK profile appears balanced for many field crops.")
+        return hints
