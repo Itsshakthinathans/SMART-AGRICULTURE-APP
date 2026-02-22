@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Agriculture App</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <h1>Smart Agriculture</h1>
+    <p>Crop Recommendation + Plant Disease Detection with ML</p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Crop Recommendation</h2>
+      <form id="cropForm" class="grid">
+        <input type="number" step="any" name="nitrogen" placeholder="Nitrogen (N)" required />
+        <input type="number" step="any" name="phosphorus" placeholder="Phosphorus (P)" required />
+        <input type="number" step="any" name="potassium" placeholder="Potassium (K)" required />
+        <input type="number" step="any" name="temperature" placeholder="Temperature (°C)" required />
+        <input type="number" step="any" name="humidity" placeholder="Humidity (%)" required />
+        <input type="number" step="any" name="ph" placeholder="pH" required />
+        <input type="number" step="any" name="rainfall" placeholder="Rainfall (mm)" required />
+        <button type="submit">Recommend Crop</button>
+      </form>
+      <div id="cropResult" class="result"></div>
+    </section>
+
+    <section class="card">
+      <h2>Plant Disease Detection</h2>
+      <form id="diseaseForm">
+        <input type="file" id="leafImage" accept="image/*" required />
+        <button type="submit">Detect Disease</button>
+      </form>
+      <div id="diseaseResult" class="result"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
