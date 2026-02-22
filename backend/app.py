@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 
 from ml.crop_recommendation import CropRecommendationModel
 from ml.disease_detector import DiseaseDetector
+from ml.fertilizer_advisor import FertilizerAdvisor
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOADS = os.path.join(BASE_DIR, "uploads")
@@ -25,7 +26,15 @@ CORS(app)
 
 crop_model = None
 disease_model = None
+fertilizer_advisor = FertilizerAdvisor()
 boot_errors = []
+recent_predictions = []
+
+
+def _add_history(entry):
+    recent_predictions.append(entry)
+    if len(recent_predictions) > 25:
+        recent_predictions.pop(0)
 
 
 def init_models():
@@ -57,6 +66,7 @@ def health():
             "crop_model_ready": crop_model is not None,
             "disease_model_ready": disease_model is not None,
             "boot_errors": boot_errors,
+            "recent_predictions_count": len(recent_predictions),
         }
     )
 
@@ -72,6 +82,24 @@ def model_info():
             "crop_classes": getattr(crop_model, "classes_", []),
             "disease_classes": getattr(disease_model, "classes_", []),
             "boot_errors": boot_errors,
+        }
+    )
+
+
+@app.get("/api/recent-predictions")
+def get_recent_predictions():
+    return jsonify({"items": recent_predictions})
+
+
+@app.get("/api/crop-calendar")
+def crop_calendar():
+    return jsonify(
+        {
+            "rice": "Kharif (June-Nov), irrigated: year-round in some regions",
+            "wheat": "Rabi (Nov-Apr)",
+            "maize": "Kharif and Rabi (region dependent)",
+            "cotton": "Kharif (Apr-Oct sowing windows vary)",
+            "banana": "Year-round with irrigation",
         }
     )
 
@@ -98,8 +126,37 @@ def recommend_crop():
         return jsonify({"error": f"Invalid payload. Required numeric fields: {fields}"}), 400
 
     rec = crop_model.predict(payload)
-    fertilizer = crop_model.fertilizer_hint(payload)
-    return jsonify({**rec, "fertilizer_hints": fertilizer})
+    fertilizer_hints = crop_model.fertilizer_hint(payload)
+    fertilizer_plan = fertilizer_advisor.plan(rec["recommended_crop"], payload)
+
+    result = {**rec, "fertilizer_hints": fertilizer_hints, "fertilizer_plan": fertilizer_plan}
+    _add_history(
+        {
+            "type": "crop",
+            "time": datetime.utcnow().isoformat() + "Z",
+            "input": payload,
+            "output": {"recommended_crop": rec["recommended_crop"]},
+        }
+    )
+    return jsonify(result)
+
+
+@app.post("/api/fertilizer-plan")
+def fertilizer_plan():
+    data = request.get_json(force=True)
+    required = ["crop", "nitrogen", "phosphorus", "potassium"]
+    try:
+        for k in required:
+            _ = data[k]
+        values = {
+            "nitrogen": float(data["nitrogen"]),
+            "phosphorus": float(data["phosphorus"]),
+            "potassium": float(data["potassium"]),
+        }
+    except Exception:
+        return jsonify({"error": f"Invalid payload. Required fields: {required}"}), 400
+
+    return jsonify(fertilizer_advisor.plan(data["crop"], values))
 
 
 @app.post("/api/disease-detect")
@@ -119,6 +176,14 @@ def detect_disease():
     f.save(save_path)
 
     result = disease_model.predict(save_path)
+    _add_history(
+        {
+            "type": "disease",
+            "time": datetime.utcnow().isoformat() + "Z",
+            "input": {"filename": filename},
+            "output": {"disease": result["disease"], "confidence": result["confidence"]},
+        }
+    )
     return jsonify(result)
 
 

@@ -1,91 +1,53 @@
-# AgriTech Pro - Full Stack Smart Agriculture Platform
+# AgriTech Pro (Enhanced) - Full Stack Smart Agriculture Platform
 
-A complete full-stack project for:
-1. **Crop recommendation** using ML trained from a Kaggle crop dataset.
-2. **Plant disease detection** from leaf images using ML trained from Kaggle PlantVillage-style data.
-3. **Actionable advisory** with fertilizer hints and disease treatment guidance.
+This is an enhanced AgriTech-style full-stack app with a distinct implementation and expanded modules.
 
-Built with **Flask (Python ML API)** + **Node.js (gateway)** + **HTML/CSS/JS frontend**.
+## What’s Included
+- Crop recommendation using a Kaggle-trained ML model.
+- Plant disease detection from leaf images (Kaggle PlantVillage-style training).
+- Fertilizer planner endpoint + UI module.
+- Crop calendar API for seasonal planning.
+- Model observability (health, model-info, retrain).
+- Recent prediction logs endpoint.
+- Node.js gateway + responsive dashboard frontend.
 
-## Key Functionalities
-- Kaggle-dataset-based model training (not just synthetic demo data).
-- Model health + status API.
-- Manual model retraining endpoint.
-- Crop recommendation with top-5 confidence predictions.
-- NPK-based fertilizer hint generation.
-- Leaf-image disease classification with top matches.
-- Clean modern UI with model status panel.
-- Optional weather auto-fill by geolocation (Open-Meteo API in browser).
+## Stack
+- Frontend: HTML/CSS/JavaScript
+- Gateway: Node.js + Express
+- ML API: Python + Flask + scikit-learn
 
-## Architecture
+## Kaggle Datasets
+- Crop: `atharvaingle/crop-recommendation-dataset`
+- Disease: `emmarex/plantdisease`
 
-```
-Browser (public/) -> Node.js Express (server.js) -> Flask ML API (backend/app.py)
-```
+Put datasets according to: `backend/data/README.md`.
 
-## Kaggle Datasets Used
-- Crop recommendation: `atharvaingle/crop-recommendation-dataset`
-- Plant disease: `emmarex/plantdisease`
+## Run
+1. Backend:
+   ```bash
+   cd backend
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   python app.py
+   ```
+2. Gateway + frontend:
+   ```bash
+   npm install
+   npm start
+   ```
+3. Open: `http://localhost:3000`
 
-See setup instructions in `backend/data/README.md`.
-
-## Project Structure
-
-```
-.
-├── backend
-│   ├── app.py
-│   ├── requirements.txt
-│   ├── data
-│   │   └── README.md
-│   ├── scripts
-│   │   └── fetch_kaggle_data.py
-│   └── ml
-│       ├── crop_recommendation.py
-│       ├── disease_detector.py
-│       └── models/
-├── public
-│   ├── index.html
-│   ├── script.js
-│   └── styles.css
-├── package.json
-└── server.js
-```
-
-## Setup
-
-### 1) Python backend
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-### 2) Put Kaggle datasets in place
-Follow `backend/data/README.md`.
-
-### 3) Run Flask
-```bash
-python app.py
-```
-
-### 4) Run Node server (new terminal)
-```bash
-npm install
-npm start
-```
-
-Open: `http://localhost:3000`
-
-## API Endpoints
-
+## Endpoints
 - `GET /health`
 - `GET /api/model-info`
+- `GET /api/recent-predictions`
+- `GET /api/crop-calendar`
 - `POST /api/train-models`
 - `POST /api/recommend-crop`
-- `POST /api/disease-detect` (`multipart/form-data`, key `leafImage`)
+- `POST /api/fertilizer-plan`
+- `POST /api/disease-detect`
 
 ## Notes
-- If datasets are missing, `/health` and `/api/model-info` show boot errors with exact paths.
-- Retraining can be triggered after placing new data.
+- If datasets are missing, the health endpoint reports precise boot errors.
+- A Kaggle download helper exists in `backend/scripts/fetch_kaggle_data.py`.

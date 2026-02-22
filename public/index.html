@@ -3,50 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AgriTech Pro - Smart Agriculture</title>
+  <title>AgriTech Pro Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="hero">
-    <h1>AgriTech Pro</h1>
-    <p>Kaggle-trained Crop Recommendation + Plant Disease Detection + Advisory</p>
+    <h1>AgriTech Pro Dashboard</h1>
+    <p>Crop Intelligence • Disease AI • Fertilizer Planning • Farm Assist</p>
     <div class="hero-actions">
-      <button id="checkHealthBtn">Check Backend Health</button>
-      <button id="retrainBtn">Retrain Models</button>
+      <button id="checkHealthBtn">Health</button>
+      <button id="retrainBtn">Retrain</button>
+      <button id="loadModelInfoBtn">Models</button>
+      <button id="loadRecentBtn">Recent Logs</button>
     </div>
-    <pre id="healthBox">Click "Check Backend Health" to inspect model readiness.</pre>
+    <pre id="healthBox">System status will appear here.</pre>
   </header>
 
   <main class="container">
     <section class="card">
-      <h2>🌾 Crop Recommendation</h2>
+      <h2>Crop Recommendation</h2>
       <form id="cropForm" class="grid-2">
         <input type="number" step="any" name="nitrogen" placeholder="Nitrogen (N)" required />
         <input type="number" step="any" name="phosphorus" placeholder="Phosphorus (P)" required />
         <input type="number" step="any" name="potassium" placeholder="Potassium (K)" required />
         <input type="number" step="any" name="temperature" placeholder="Temperature (°C)" required />
         <input type="number" step="any" name="humidity" placeholder="Humidity (%)" required />
-        <input type="number" step="any" name="ph" placeholder="Soil pH" required />
+        <input type="number" step="any" name="ph" placeholder="pH" required />
         <input type="number" step="any" name="rainfall" placeholder="Rainfall (mm)" required />
-        <button type="button" id="weatherFillBtn">Auto-fill Weather (Location)</button>
-        <button type="submit">Recommend Crop</button>
+        <button type="button" id="weatherFillBtn">Auto Weather</button>
+        <button type="submit">Recommend</button>
       </form>
       <div id="cropResult" class="result"></div>
     </section>
 
     <section class="card">
-      <h2>🍃 Disease Detection</h2>
+      <h2>Plant Disease Detection</h2>
       <form id="diseaseForm" class="stack">
         <input type="file" id="leafImage" accept="image/*" required />
-        <button type="submit">Detect Disease</button>
+        <button type="submit">Analyze Leaf</button>
       </form>
       <div id="diseaseResult" class="result"></div>
     </section>
 
+    <section class="card">
+      <h2>Fertilizer Planner</h2>
+      <form id="fertForm" class="grid-2">
+        <input type="text" name="crop" placeholder="Crop (e.g., rice)" required />
+        <input type="number" step="any" name="nitrogen" placeholder="N" required />
+        <input type="number" step="any" name="phosphorus" placeholder="P" required />
+        <input type="number" step="any" name="potassium" placeholder="K" required />
+        <button type="submit">Generate Plan</button>
+      </form>
+      <div id="fertResult" class="result"></div>
+    </section>
+
     <section class="card full">
-      <h2>📊 Model Info</h2>
-      <button id="loadModelInfoBtn">Load Model Info</button>
-      <pre id="modelInfoBox">No data loaded yet.</pre>
+      <h2>Model Info / Crop Calendar / Recent Predictions</h2>
+      <div class="inline-actions">
+        <button id="loadCalendarBtn">Load Crop Calendar</button>
+      </div>
+      <pre id="modelInfoBox">No model info yet.</pre>
+      <pre id="calendarBox">No crop calendar yet.</pre>
+      <pre id="recentBox">No recent predictions yet.</pre>
     </section>
   </main>
 

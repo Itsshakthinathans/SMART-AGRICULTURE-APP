@@ -13,7 +13,16 @@ app.use(cors());
 app.use(express.json({ limit: '4mb' }));
 app.use(express.static('public'));
 
-const proxyJsonPost = async (path, body, res) => {
+const proxyGet = async (path, res) => {
+  try {
+    const r = await axios.get(`${FLASK_URL}${path}`);
+    return res.status(r.status).json(r.data);
+  } catch (error) {
+    return res.status(error.response?.status || 500).json(error.response?.data || { error: 'Gateway error' });
+  }
+};
+
+const proxyPost = async (path, body, res) => {
   try {
     const r = await axios.post(`${FLASK_URL}${path}`, body);
     return res.status(r.status).json(r.data);
@@ -22,34 +31,14 @@ const proxyJsonPost = async (path, body, res) => {
   }
 };
 
-app.get('/api/health', async (_, res) => {
-  try {
-    const r = await axios.get(`${FLASK_URL}/health`);
-    res.json(r.data);
-  } catch {
-    res.status(503).json({ error: 'Flask backend unreachable' });
-  }
-});
+app.get('/api/health', async (_, res) => proxyGet('/health', res));
+app.get('/api/model-info', async (_, res) => proxyGet('/api/model-info', res));
+app.get('/api/recent-predictions', async (_, res) => proxyGet('/api/recent-predictions', res));
+app.get('/api/crop-calendar', async (_, res) => proxyGet('/api/crop-calendar', res));
 
-app.get('/api/model-info', async (_, res) => {
-  try {
-    const r = await axios.get(`${FLASK_URL}/api/model-info`);
-    res.json(r.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json(error.response?.data || { error: 'Gateway error' });
-  }
-});
-
-app.post('/api/train-models', async (_, res) => {
-  try {
-    const r = await axios.post(`${FLASK_URL}/api/train-models`);
-    res.status(r.status).json(r.data);
-  } catch (error) {
-    res.status(error.response?.status || 500).json(error.response?.data || { error: 'Gateway error' });
-  }
-});
-
-app.post('/api/recommend-crop', async (req, res) => proxyJsonPost('/api/recommend-crop', req.body, res));
+app.post('/api/train-models', async (_, res) => proxyPost('/api/train-models', {}, res));
+app.post('/api/recommend-crop', async (req, res) => proxyPost('/api/recommend-crop', req.body, res));
+app.post('/api/fertilizer-plan', async (req, res) => proxyPost('/api/fertilizer-plan', req.body, res));
 
 app.post('/api/disease-detect', upload.single('leafImage'), async (req, res) => {
   try {
@@ -69,4 +58,4 @@ app.post('/api/disease-detect', upload.single('leafImage'), async (req, res) => 
   }
 });
 
-app.listen(PORT, () => console.log(`Smart Agriculture app running: http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`AgriTech Pro running at http://localhost:${PORT}`));
