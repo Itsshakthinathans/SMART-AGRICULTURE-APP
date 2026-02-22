@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreenPulse Agriculture Analytics</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Smart Farming Platform</p>
+        <h1>GreenPulse Agriculture Analytics</h1>
+      </div>
+      <button id="themeToggle" aria-label="Toggle Theme">🌙</button>
+    </header>
+
+    <main class="layout">
+      <section class="panel summary">
+        <h2>Farm Overview</h2>
+        <div class="cards" id="summaryCards"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Crop Dataset</h2>
+          <input id="search" placeholder="Search by crop or region..." />
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Crop</th>
+              <th>Region</th>
+              <th>Area (ha)</th>
+              <th>Yield (t/ha)</th>
+              <th>Moisture</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="cropRows"></tbody>
+        </table>
+      </section>
+
+      <section class="panel grid-2">
+        <article>
+          <h3>Irrigation Suggestions</h3>
+          <ul id="irrigationTips"></ul>
+        </article>
+        <article>
+          <h3>Alerts</h3>
+          <ul id="alerts"></ul>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

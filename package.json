@@ -1,0 +1,13 @@
+{
+  "name": "smart-agriculture-app",
+  "version": "1.0.0",
+  "description": "Full-stack crop recommendation and plant disease detection platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
